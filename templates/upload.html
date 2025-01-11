@@ -50,6 +50,51 @@
                 reader.readAsDataURL(file);
             }
         }
+        function cropCanvas() {
+            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            const data = imageData.data;
+
+            let minX = canvas.width, minY = canvas.height, maxX = 0, maxY = 0;
+            let found = false;
+
+            // Iterate through the pixels to find the bounding box
+            for (let y = 0; y < canvas.height; y++) {
+                for (let x = 0; x < canvas.width; x++) {
+                    const index = (y * canvas.width + x) * 4; // RGBA pixel data
+                    const r = data[index];
+                    const g = data[index + 1];
+                    const b = data[index + 2];
+                    const alpha = data[index + 3];
+
+                    // Check if the pixel is non-black (drawn)
+                    if (r !== 0 || g !== 0 || b !== 0 || alpha !== 0) {
+                        found = true;
+                        if (x < minX) minX = x;
+                        if (y < minY) minY = y;
+                        if (x > maxX) maxX = x;
+                        if (y > maxY) maxY = y;
+                    }
+                }
+            }
+
+            // If no drawn region is found, return the original canvas
+            if (!found) {
+                console.log("No drawing detected.");
+                return canvas;
+            }
+
+            // Crop the canvas to the bounding box
+            const croppedWidth = maxX - minX + 1;
+            const croppedHeight = maxY - minY + 1;
+            const croppedCanvas = document.createElement("canvas");
+            croppedCanvas.width = croppedWidth;
+            croppedCanvas.height = croppedHeight;
+
+            const croppedCtx = croppedCanvas.getContext("2d");
+            croppedCtx.drawImage(canvas, minX, minY, croppedWidth, croppedHeight, 0, 0, croppedWidth, croppedHeight);
+
+            return croppedCanvas;
+        }
 
         const canvas = document.getElementById('drawingCanvas');
         const ctx = canvas.getContext('2d');
@@ -102,7 +147,8 @@
         }
 
         function submitDrawing() {
-            const dataURL = canvas.toDataURL('image/png');
+            const croppedCanvas = cropCanvas(); // Get the cropped version of the canvas
+            const dataURL = croppedCanvas.toDataURL("image/png");
             fetch('/predict-drawing', {
                 method: 'POST',
                 headers: {
