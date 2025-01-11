@@ -4,9 +4,24 @@
 </head>
 
 <body>
-    <h1>Minist Data Prediction</h1>
-    <h1>Upload a Photo</h1>
+    <h1>MNIST Data Prediction</h1>
+    
+    <h2>Draw a Number</h2>
+    <p>Draw the number to fit the canvas</p>
 
+    <div class="canvas-container">
+        <canvas id="drawingCanvas" width="280" height="280"></canvas>
+        <div class="button-container">
+            <button onclick="clearCanvas()">Clear</button>
+            <button onclick="submitDrawing()">Predict</button>
+        </div>
+    </div>
+
+    <h2 id="prediction">Prediction will appear here.</h2>
+
+    <hr>
+
+    <h2>Upload a Photo to Predict</h2>
     <form action="/predict" method="POST" enctype="multipart/form-data">
         <input type="file" id="photo" name="photo" accept="image/*" required onchange="previewImage(event)"><br><br>
         <div class="preview-container">
@@ -14,27 +29,76 @@
         </div>
         <input type="submit" value="Predict Photo">
     </form>
+    {% if prediction %}
+    <h2>Prediction Result: {{ prediction }}</h2>
+    {% endif %}
 
-        {% if prediction %}
-        <h2>Prediction Result: {{ prediction }}</h2>
-        {% endif %}
 
-        <script>
-            function previewImage(event) {
-                const file = event.target.files[0];
-                const preview = document.getElementById('preview');
-    
-                if (file) {
-                    const reader = new FileReader();
-    
-                    reader.onload = function(e) {
-                        preview.src = e.target.result;
-                        preview.style.display = 'block'; // Show the preview image
-                    };
-    
-                    reader.readAsDataURL(file);
-                }
+    <script>
+        function previewImage(event) {
+            const file = event.target.files[0];
+            const preview = document.getElementById('preview');
+
+            if (file) {
+                const reader = new FileReader();
+
+                reader.onload = function(e) {
+                    preview.src = e.target.result;
+                    preview.style.display = 'block'; 
+                };
+
+                reader.readAsDataURL(file);
             }
-        </script>
+        }
+
+        const canvas = document.getElementById('drawingCanvas');
+        const ctx = canvas.getContext('2d');
+        let isDrawing = false;
+
+        ctx.fillStyle = 'black';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        canvas.addEventListener('mousedown', () => (isDrawing = true));
+        canvas.addEventListener('mouseup', () => (isDrawing = false));
+        canvas.addEventListener('mousemove', draw);
+
+        function draw(event) {
+            if (!isDrawing) return;
+
+            ctx.fillStyle = 'white';
+            ctx.beginPath();
+            ctx.arc(
+                event.offsetX,
+                event.offsetY,
+                5, 
+                0,
+                Math.PI * 2
+            );
+            ctx.fill();
+        }
+
+        function clearCanvas() {
+            ctx.fillStyle = 'black';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+        }
+
+        function submitDrawing() {
+            const dataURL = canvas.toDataURL('image/png');
+            fetch('/predict-drawing', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ image: dataURL }),
+            })
+                .then((response) => response.json())
+                .then((data) => {
+                    document.getElementById('prediction').innerText =
+                        'Prediction: ' + data.prediction;
+                })
+                .catch((error) => console.error('Error:', error));
+        }
+
+    </script>
 </body>
 </html>
