@@ -1,0 +1,40 @@
+<html>
+<head>
+    <link rel="stylesheet" href="/static/mycss.css">
+</head>
+
+<body>
+    <h1>Minist Data Prediction</h1>
+    <h1>Upload a Photo</h1>
+
+    <form action="/predict" method="POST" enctype="multipart/form-data">
+        <input type="file" id="photo" name="photo" accept="image/*" required onchange="previewImage(event)"><br><br>
+        <div class="preview-container">
+            <img id="preview" alt="Image Preview">
+        </div>
+        <input type="submit" value="Predict Photo">
+    </form>
+
+        {% if prediction %}
+        <h2>Prediction Result: {{ prediction }}</h2>
+        {% endif %}
+
+        <script>
+            function previewImage(event) {
+                const file = event.target.files[0];
+                const preview = document.getElementById('preview');
+    
+                if (file) {
+                    const reader = new FileReader();
+    
+                    reader.onload = function(e) {
+                        preview.src = e.target.result;
+                        preview.style.display = 'block'; // Show the preview image
+                    };
+    
+                    reader.readAsDataURL(file);
+                }
+            }
+        </script>
+</body>
+</html>
