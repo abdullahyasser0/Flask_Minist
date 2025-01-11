@@ -58,23 +58,42 @@
         ctx.fillStyle = 'black';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-        canvas.addEventListener('mousedown', () => (isDrawing = true));
-        canvas.addEventListener('mouseup', () => (isDrawing = false));
-        canvas.addEventListener('mousemove', draw);
+        function getCoordinates(event) {
+            if (event.touches) {
+                const rect = canvas.getBoundingClientRect();
+                return {
+                    x: event.touches[0].clientX - rect.left,
+                    y: event.touches[0].clientY - rect.top,
+                };
+            } else {
+                return {
+                    x: event.offsetX,
+                    y: event.offsetY,
+                };
+            }
+        }
+
+        function startDrawing(event) {
+            isDrawing = true;
+            const { x, y } = getCoordinates(event);
+            ctx.beginPath();
+            ctx.arc(x, y, 5, 0, Math.PI * 2);
+            ctx.fillStyle = 'white';
+            ctx.fill();
+        }
 
         function draw(event) {
             if (!isDrawing) return;
-
-            ctx.fillStyle = 'white';
+            const { x, y } = getCoordinates(event);
             ctx.beginPath();
-            ctx.arc(
-                event.offsetX,
-                event.offsetY,
-                5, 
-                0,
-                Math.PI * 2
-            );
+            ctx.arc(x, y, 5, 0, Math.PI * 2);
+            ctx.fillStyle = 'white';
             ctx.fill();
+        }
+
+        function stopDrawing() {
+            isDrawing = false;
+            ctx.closePath();
         }
 
         function clearCanvas() {
@@ -93,11 +112,25 @@
             })
                 .then((response) => response.json())
                 .then((data) => {
-                    document.getElementById('prediction').innerText =
-                        'Prediction: ' + data.prediction;
+                    document.getElementById('prediction').innerText = 'Prediction: ' + data.prediction;
                 })
                 .catch((error) => console.error('Error:', error));
         }
+
+        canvas.addEventListener('mousedown', startDrawing);
+        canvas.addEventListener('mousemove', draw);
+        canvas.addEventListener('mouseup', stopDrawing);
+        canvas.addEventListener('mouseout', stopDrawing);
+
+        canvas.addEventListener('touchstart', (event) => {
+            event.preventDefault(); 
+            startDrawing(event);
+        });
+        canvas.addEventListener('touchmove', (event) => {
+            event.preventDefault(); 
+            draw(event);
+        });
+        canvas.addEventListener('touchend', stopDrawing);
 
     </script>
 </body>
