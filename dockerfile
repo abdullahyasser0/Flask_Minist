@@ -16,4 +16,4 @@ RUN python -m venv /opt/venv && \
 EXPOSE 5000
 
 # Run the application
-CMD ["python", "app.py"]
+CMD ["python", "main.py"]
