@@ -22,6 +22,7 @@ This project demonstrates a straightforward deployment of a machine learning mod
 You can interact with the deployed application here:
 
 🌐 **Live URL**: [flaskminist-production.up.railway.app](https://flaskminist-production.up.railway.app)
+![image](https://github.com/user-attachments/assets/5739a6bd-a7e6-49df-ad5e-4336c95e29a8)
 
 ---
 
