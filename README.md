@@ -48,7 +48,7 @@ Before running the project, ensure you have the following installed:
    Ensure the directory structure looks like this:
    ```
    project/
-   ├── app.py
+   ├── main.py
    ├── templates/
    │   └── upload.html
    ├── static/
@@ -63,7 +63,7 @@ Before running the project, ensure you have the following installed:
 1. **Start the Flask Server**:
    Run the application using:
    ```bash
-   python app.py
+   python main.py
    ```
 
 2. **Access the Application**:
@@ -119,7 +119,6 @@ This project is open-source and available under the MIT License.
 
 #### Author
 
-[Your Name]  
-[Your Contact Information or GitHub Profile]  
-
+Abdullah Yasser 
+Abdullahyasser2506@gmail.com
 Let me know if you need additional information or enhancements!
