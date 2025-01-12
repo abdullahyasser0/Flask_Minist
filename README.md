@@ -18,6 +18,13 @@ This project demonstrates a straightforward deployment of a machine learning mod
 
 ---
 
+### Live Application
+Access the Live Application
+You can interact with the deployed application here:
+
+🌐 Live URL: flaskminist-production.up.railway.app
+
+
 #### Prerequisites
 
 Before running the project, ensure you have the following installed:
